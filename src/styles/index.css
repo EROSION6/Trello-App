@@ -1,0 +1,11 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+.hover {
+  transition: border 0.2s ease;
+}
+
+.hover:hover {
+  border: 1px solid rgb(239 68 68 / 100%);
+}
