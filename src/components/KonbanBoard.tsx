@@ -4,11 +4,13 @@ import '@/styles/index.css';
 import { useState } from 'react';
 import { TypeColumn } from '@/types';
 import { ScrollArea, ScrollBar } from './ui/scroll-area';
+import { Search } from './Search';
 
 export const KonbanBoard = () => {
   const [column, setColumn] = useState<TypeColumn[]>([
     { id: 12333, body: 'Column 1' },
   ]);
+  const [search, setSearch] = useState('');
 
   // Create Column
   const handleAddColumn = () => {
@@ -24,21 +26,27 @@ export const KonbanBoard = () => {
     setColumn(column.filter((col) => col.id !== id));
   };
 
+  // Column Filtering
+  const filterColumn = column.filter((col) =>
+    col.body.toLowerCase().includes(search.toLowerCase())
+  );
+
   // Chnage title column
   const handleUpdateTitle = (id: number | string, body: string) => {
     setColumn(
       column.map((col) => {
-        if (col.id !== id) return col;
-        return { ...col, body };
+        if (col.id === id) return { ...col, body };
+        return col;
       })
     );
   };
 
   return (
-    <div className="w-full h-screen bg-gray-950 flex items-center pl-16">
+    <div className="w-full h-screen bg-gray-950 flex flex-col justify-evenly pl-16">
+      <Search search={search} setSearch={setSearch} />
       <ScrollArea>
         <div className="flex items-start space-x-5 mb-5">
-          {column.map((col) => (
+          {filterColumn.map((col) => (
             <Card
               key={col.id}
               {...col}

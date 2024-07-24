@@ -2,13 +2,9 @@ import { CirclePlus, Trash2 } from 'lucide-react';
 import { Button } from './ui/button';
 import '@/styles/index.css';
 import { ScrollArea } from './ui/scroll-area';
-import { taskData } from '@/data';
-import { TypeColumn } from '@/types';
+import { TypeColumn, TypeTask } from '@/types';
 import { useState } from 'react';
-
-interface TypeItemsProps {
-  body: TypeColumn['body'];
-}
+import { Items } from './Items';
 
 interface TypeCardProps {
   col: TypeColumn[];
@@ -20,18 +16,50 @@ interface TypeCardProps {
 
 export const Card = ({
   id,
-  col,
   body,
   handleDeleteColumn,
   handleUpdateTitle,
 }: TypeCardProps) => {
-  const [task, setTask] = useState(taskData);
+  const [task, setTask] = useState<TypeTask[]>([]);
   const [editBody, setEditBody] = useState(false);
+  const [editTaskBody, setEditTaskBody] = useState(false);
 
+  // KeyDown Column
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter') {
       setEditBody(false);
     }
+  };
+
+  // Create task
+  const handleAddTask = () => {
+    const object = {
+      id: Math.floor(Math.random() * 1000),
+      body: 'Content...',
+    };
+    body === '' ? alert('Write title') : setTask([...task, object]);
+  };
+
+  // Delete task
+  const handleDeleteTask = (id: TypeTask['id']) => {
+    setTask(task.filter((t) => t.id !== id));
+  };
+
+  // KeyDown Task
+  const handleKeyDownTask = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      setEditBody(false);
+    }
+  };
+
+  // Ipdate body name
+  const handleUpdateTaskBody = (id: number | string, body: string) => {
+    setTask(
+      task.map((t) => {
+        if (t.id === id) return { ...t, body };
+        return t;
+      })
+    );
   };
   return (
     <div className="w-[26rem] h-2/3 bg-gray-900 rounded-xl p-1 flex flex-col justify-between">
@@ -53,7 +81,7 @@ export const Card = ({
                   value={body}
                   autoFocus
                   onBlur={() => setEditBody(false)}
-                  className="w-full bg-gray-950 rounded-xl outline-none px-2"
+                  className="w-full bg-gray-950 rounded-md outline-none px-2"
                   onChange={(e) => handleUpdateTitle(id, e.target.value)}
                   onKeyDown={handleKeyDown}
                 />
@@ -70,28 +98,34 @@ export const Card = ({
         </div>
         {/* Card */}
         <ScrollArea className="h-[32rem]">
-          {taskData.map((task) => (
-            <Items key={task.id} {...task} />
-          ))}
+          {task.length > 0 ? (
+            task.map((t) => (
+              <Items
+                key={t.id}
+                {...t}
+                handleDeleteTask={handleDeleteTask}
+                editTaskBody={editTaskBody}
+                setEditTaskBody={setEditTaskBody}
+                handleKeyDownTask={handleKeyDownTask}
+                handleUpdateTaskBody={handleUpdateTaskBody}
+              />
+            ))
+          ) : (
+            <h1 className="text-2xl font-semibold text-white m-3">
+              Create task&#129402;
+            </h1>
+          )}
         </ScrollArea>
       </div>
       {/* Footer */}
       <footer className="w-full cursor-pointer my-4 mx-3">
-        <button className="w-full bg-transparent flex items-center gap-x-2 text-xl text-white font-semibold">
+        <button
+          className="w-full bg-transparent flex items-center gap-x-2 text-xl text-white font-semibold"
+          onClick={handleAddTask}
+        >
           <CirclePlus /> Add task
         </button>
       </footer>
     </div>
   );
 };
-
-const Items = ({ body }: TypeItemsProps) => (
-  <div
-    className={`w-full h-28 bg-gray-950 rounded-xl flex items-center justify-between px-3 py-5 mt-2 cursor-pointer ${'hover'}`}
-  >
-    <p className="h-full text-white font-semibold">{body}</p>
-    <Button size={'sm'} variant={'destructive'}>
-      <Trash2 size={23} />
-    </Button>
-  </div>
-);

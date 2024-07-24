@@ -9,3 +9,11 @@
 .hover:hover {
   border: 1px solid rgb(239 68 68 / 100%);
 }
+
+.input {
+  transition: border 0.4s ease;
+}
+
+input:focus {
+  border: 1px solid rgb(239 68 68 / 100%);
+}
