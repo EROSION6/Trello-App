@@ -7,6 +7,7 @@ import { Button } from './ui/button'
 import { ScrollArea } from './ui/scroll-area'
 
 interface TypeCardProps {
+	column: TypeColumn
 	id: TypeColumn['id']
 	body: TypeColumn['body']
 	handleDragStart: (col: TypeColumn) => void
@@ -19,6 +20,7 @@ interface TypeCardProps {
 export const Card = ({
 	id,
 	body,
+	column,
 	handleDeleteColumn,
 	handleUpdateTitle,
 	handleDragOver,
@@ -28,6 +30,37 @@ export const Card = ({
 	const [task, setTask] = useState<TypeTask[]>([])
 	const [editBody, setEditBody] = useState(false)
 	const [editTaskBody, setEditTaskBody] = useState(false)
+	const [draggingTask, setDraggingTask] = useState<null | TypeTask>(null)
+	const [targetTask, setTargetTask] = useState<null | TypeTask>(null)
+
+	// dragn and drop
+	const handleDragOverTask = (
+		e: React.DragEvent<HTMLDivElement>,
+		task: TypeTask
+	) => {
+		e.preventDefault()
+		setTargetTask(task)
+	}
+	const handleDragStartTask = (task: TypeTask) => {
+		setDraggingTask(task)
+	}
+	
+	const handleDragTask = () => {
+		if (draggingTask && targetTask) {
+			const newTask = task.map(t => {
+				if (t.id === draggingTask.id) {
+					return targetTask
+				} else if (t.id === targetTask.id) {
+					return draggingTask
+				}
+				return t
+			})
+
+			setTask(newTask)
+		}
+		setDraggingTask(null)
+		setTargetTask(null)
+	}
 
 	// KeyDown Column
 	const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
@@ -71,8 +104,8 @@ export const Card = ({
 		<div
 			className='w-[26rem] h-2/3 bg-gray-900 rounded-xl p-1 flex flex-col justify-between cursor-grab'
 			draggable
-			onDragStart={() => handleDragStart({ id, body })}
-			onDragOver={e => handleDragOver(e, { id, body })}
+			onDragStart={() => handleDragStart({ id, body, task })}
+			onDragOver={e => handleDragOver(e, { id, body, task })}
 			onDrop={handleDrop}
 		>
 			{/* Menu  */}
@@ -110,8 +143,8 @@ export const Card = ({
 				</div>
 				{/* Card */}
 				<ScrollArea className='h-[32rem]'>
-					{task.length > 0 ? (
-						task.map(t => (
+					{[...(column.task || []), ...task].length > 0 ? (
+						[...(column.task || []), ...task].map(t => (
 							<Items
 								key={t.id}
 								{...t}
@@ -120,6 +153,9 @@ export const Card = ({
 								setEditTaskBody={setEditTaskBody}
 								handleKeyDownTask={handleKeyDownTask}
 								handleUpdateTaskBody={handleUpdateTaskBody}
+								handleDragOverTask={handleDragOverTask}
+								handleDragStartTask={handleDragStartTask}
+								handleDragTask={handleDragTask}
 							/>
 						))
 					) : (

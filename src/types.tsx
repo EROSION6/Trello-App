@@ -1,9 +1,10 @@
-export type TypeColumn = {
+export type TypeTask = {
 	id: string | number
 	body: string
 }
 
-export type TypeTask = {
+export type TypeColumn = {
 	id: string | number
 	body: string
+	task: TypeTask[]
 }

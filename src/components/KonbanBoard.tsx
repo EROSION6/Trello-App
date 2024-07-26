@@ -1,3 +1,4 @@
+import { fakeColumn } from '@/data'
 import '@/styles/index.css'
 import { TypeColumn } from '@/types'
 import { CirclePlus } from 'lucide-react'
@@ -7,11 +8,7 @@ import { Search } from './Search'
 import { ScrollArea, ScrollBar } from './ui/scroll-area'
 
 export const KonbanBoard = () => {
-	const [column, setColumn] = useState<TypeColumn[]>([
-		{ id: 12333, body: 'Column 1' },
-		{ id: 12343, body: 'Column 2' },
-		{ id: 12223, body: 'Column 3' },
-	])
+	const [column, setColumn] = useState<TypeColumn[]>(fakeColumn)
 	const [search, setSearch] = useState('')
 	const [draggingColumn, setDraggingColumn] = useState<null | TypeColumn>(null)
 	const [targetColumn, setTargetColumn] = useState<null | TypeColumn>(null)
@@ -50,6 +47,7 @@ export const KonbanBoard = () => {
 		const object = {
 			id: Math.floor(Math.random() * 1000),
 			body: `column ${column.length + 1}`,
+			task: [],
 		}
 		setColumn([...column, object])
 	}
@@ -83,6 +81,7 @@ export const KonbanBoard = () => {
 						<Card
 							key={col.id}
 							{...col}
+							column={column}
 							handleDeleteColumn={handleDeleteColumn}
 							handleUpdateTitle={handleUpdateTitle}
 							handleDragStart={handleDragStart}
